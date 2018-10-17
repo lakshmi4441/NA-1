@@ -3,8 +3,8 @@ host='72,36,65,67'
 port=1994
 s=socket.socket()
 s.connect((host,port))
-m==raw_input("Press enter-->")
-g=open('lakshmi.txt',rb')
+m=raw_input("Press enter-->")
+g=open('lakshmi.txt','rb')
 n=g.read()
 while True:
      if m=='exit':
