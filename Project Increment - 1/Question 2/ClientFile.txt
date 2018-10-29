@@ -1,0 +1,266 @@
+INTRODUCTION
+Hello World is often used by developers to familiarize themselves with new concepts by building a simple program. This tutorial aims to achieve a similar purpose by getting practitioners started with Hadoop and HDP. We will use an Internet of Things (IoT) use case to build your first HDP application.
+
+This tutorial describes how to refine data for a Trucking IoT  Data Discovery (aka IoT Discovery) use case using the Hortonworks Data Platform. The IoT Discovery use cases involves vehicles, devices and people moving across a map or similar surface. Your analysis is targeted to linking location information with your analytic data.
+
+For our tutorial we are looking at a use case where we have a truck fleet. Each truck has been equipped to log location and event data. These events are streamed back to a datacenter where we will be processing the data.  The company wants to use this data to better understand risk.
+
+Here is the video of Analyzing Geolocation Data to show you what you’ll be doing in this tutorial.
+
+PRE-REQUISITES:
+Downloaded and Installed Hortonworks Sandbox
+Before entering hello HDP labs, we highly recommend you go through Learning the Ropes of the Hortonworks Sandbox to become familiar with the Sandbox in a VM and the Ambari Interface.
+Data Set Used: Geolocation.zip
+Optional: Hortonworks ODBC driver installed and configured – see the tutorial on installing the ODBC driver for Windows or OS X. Refer to
+Installing and Configuring the Hortonworks ODBC driver on Windows 7
+Installing and Configuring the Hortonworks ODBC driver on Mac OS X
+In this tutorial, the Hortonworks Sandbox is installed on an Oracle VirtualBox virtual machine (VM) – your screens may be different.
+TUTORIAL OVERVIEW
+In this tutorial, we will provide the collected geolocation and truck data. We will import this data into HDFS and build derived tables in Hive. Then we will process the data using Pig, Hive and Spark. The processed data is then visualized using Apache Zeppelin.
+
+To refine and analyze Geolocation data, we will:
+
+Review some Hadoop Fundamentals
+Download and extract the Geolocation data files.
+Load the captured data into the Hortonworks Sandbox.
+Run Hive, Pig and Spark scripts that compute truck mileage and driver risk factor.
+Visualize the geolocation data using Zeppelin.
+GOALS OF THE TUTORIAL
+The goal of this tutorial is that you get familiar with the basics of following:
+
+Hadoop and HDP
+Ambari File User Views and HDFS
+Ambari Hive User Views and Apache Hive
+Ambari Pig User Views and Apache Pig
+Apache Spark
+Data Visualization with Zeppelin (Optional)
+
+People often ask why do Pig and Hive exist when they seem to do much of the same thing. 
+Hive because of its SQL like query language is often used as the interface to an Apache Hadoop based data warehouse. 
+Hive is considered friendlier and more familiar to users who are used to using SQL for querying data. 
+Pig fits in through its data flow strengths where it takes on the tasks of bringing data into Apache Hadoop and working with it to get it into the form for querying. 
+A good overview of how this works is in Alan Gates posting on the Yahoo Developer blog titled Pig and Hive at Yahoo!. 
+From a technical point of view, both Pig and Hive are feature complete, so you can do tasks in either tool. 
+However, you will find one tool or the other will be preferred by the different groups that have to use Apache Hadoop. 
+The good part is they have a choice and both tools work together.
+
+OUR DATA PROCESSING TASK
+We are going to do the same data processing task as we just did with Pig in the previous tutorial. 
+We have several files of truck driver statistics and we are going to bring them into Hive and do some simple computing with them. 
+We are going to compute the sum of hours and miles logged driven by a truck driver for an year. 
+Once we have the sum of hours and miles logged, we will extend the script to translate a driver id field into the name of the drivers by joining two different tables.
+
+INTRODUCTION
+Hello World is often used by developers to familiarize themselves with new concepts by building a simple program. This tutorial aims to achieve a similar purpose by getting practitioners started with Hadoop and HDP. We will use an Internet of Things (IoT) use case to build your first HDP application.
+
+This tutorial describes how to refine data for a Trucking IoT  Data Discovery (aka IoT Discovery) use case using the Hortonworks Data Platform. The IoT Discovery use cases involves vehicles, devices and people moving across a map or similar surface. Your analysis is targeted to linking location information with your analytic data.
+
+For our tutorial we are looking at a use case where we have a truck fleet. Each truck has been equipped to log location and event data. These events are streamed back to a datacenter where we will be processing the data.  The company wants to use this data to better understand risk.
+
+Here is the video of Analyzing Geolocation Data to show you what you’ll be doing in this tutorial.
+
+PRE-REQUISITES:
+Downloaded and Installed Hortonworks Sandbox
+Before entering hello HDP labs, we highly recommend you go through Learning the Ropes of the Hortonworks Sandbox to become familiar with the Sandbox in a VM and the Ambari Interface.
+Data Set Used: Geolocation.zip
+Optional: Hortonworks ODBC driver installed and configured – see the tutorial on installing the ODBC driver for Windows or OS X. Refer to
+Installing and Configuring the Hortonworks ODBC driver on Windows 7
+Installing and Configuring the Hortonworks ODBC driver on Mac OS X
+In this tutorial, the Hortonworks Sandbox is installed on an Oracle VirtualBox virtual machine (VM) – your screens may be different.
+TUTORIAL OVERVIEW
+In this tutorial, we will provide the collected geolocation and truck data. We will import this data into HDFS and build derived tables in Hive. Then we will process the data using Pig, Hive and Spark. The processed data is then visualized using Apache Zeppelin.
+
+To refine and analyze Geolocation data, we will:
+
+Review some Hadoop Fundamentals
+Download and extract the Geolocation data files.
+Load the captured data into the Hortonworks Sandbox.
+Run Hive, Pig and Spark scripts that compute truck mileage and driver risk factor.
+Visualize the geolocation data using Zeppelin.
+GOALS OF THE TUTORIAL
+The goal of this tutorial is that you get familiar with the basics of following:
+
+Hadoop and HDP
+Ambari File User Views and HDFS
+Ambari Hive User Views and Apache Hive
+Ambari Pig User Views and Apache Pig
+Apache Spark
+Data Visualization with Zeppelin (Optional)
+
+People often ask why do Pig and Hive exist when they seem to do much of the same thing. 
+Hive because of its SQL like query language is often used as the interface to an Apache Hadoop based data warehouse. 
+Hive is considered friendlier and more familiar to users who are used to using SQL for querying data. 
+Pig fits in through its data flow strengths where it takes on the tasks of bringing data into Apache Hadoop and working with it to get it into the form for querying. 
+A good overview of how this works is in Alan Gates posting on the Yahoo Developer blog titled Pig and Hive at Yahoo!. 
+From a technical point of view, both Pig and Hive are feature complete, so you can do tasks in either tool. 
+However, you will find one tool or the other will be preferred by the different groups that have to use Apache Hadoop. 
+The good part is they have a choice and both tools work together.
+
+OUR DATA PROCESSING TASK
+We are going to do the same data processing task as we just did with Pig in the previous tutorial. 
+We have several files of truck driver statistics and we are going to bring them into Hive and do some simple computing with them. 
+We are going to compute the sum of hours and miles logged driven by a truck driver for an year. 
+Once we have the sum of hours and miles logged, we will extend the script to translate a driver id field into the name of the drivers by joining two different tables.
+
+INTRODUCTION
+Hello World is often used by developers to familiarize themselves with new concepts by building a simple program. This tutorial aims to achieve a similar purpose by getting practitioners started with Hadoop and HDP. We will use an Internet of Things (IoT) use case to build your first HDP application.
+
+This tutorial describes how to refine data for a Trucking IoT  Data Discovery (aka IoT Discovery) use case using the Hortonworks Data Platform. The IoT Discovery use cases involves vehicles, devices and people moving across a map or similar surface. Your analysis is targeted to linking location information with your analytic data.
+
+For our tutorial we are looking at a use case where we have a truck fleet. Each truck has been equipped to log location and event data. These events are streamed back to a datacenter where we will be processing the data.  The company wants to use this data to better understand risk.
+
+Here is the video of Analyzing Geolocation Data to show you what you’ll be doing in this tutorial.
+
+PRE-REQUISITES:
+Downloaded and Installed Hortonworks Sandbox
+Before entering hello HDP labs, we highly recommend you go through Learning the Ropes of the Hortonworks Sandbox to become familiar with the Sandbox in a VM and the Ambari Interface.
+Data Set Used: Geolocation.zip
+Optional: Hortonworks ODBC driver installed and configured – see the tutorial on installing the ODBC driver for Windows or OS X. Refer to
+Installing and Configuring the Hortonworks ODBC driver on Windows 7
+Installing and Configuring the Hortonworks ODBC driver on Mac OS X
+In this tutorial, the Hortonworks Sandbox is installed on an Oracle VirtualBox virtual machine (VM) – your screens may be different.
+TUTORIAL OVERVIEW
+In this tutorial, we will provide the collected geolocation and truck data. We will import this data into HDFS and build derived tables in Hive. Then we will process the data using Pig, Hive and Spark. The processed data is then visualized using Apache Zeppelin.
+
+To refine and analyze Geolocation data, we will:
+
+Review some Hadoop Fundamentals
+Download and extract the Geolocation data files.
+Load the captured data into the Hortonworks Sandbox.
+Run Hive, Pig and Spark scripts that compute truck mileage and driver risk factor.
+Visualize the geolocation data using Zeppelin.
+GOALS OF THE TUTORIAL
+The goal of this tutorial is that you get familiar with the basics of following:
+
+Hadoop and HDP
+Ambari File User Views and HDFS
+Ambari Hive User Views and Apache Hive
+Ambari Pig User Views and Apache Pig
+Apache Spark
+Data Visualization with Zeppelin (Optional)
+
+People often ask why do Pig and Hive exist when they seem to do much of the same thing. 
+Hive because of its SQL like query language is often used as the interface to an Apache Hadoop based data warehouse. 
+Hive is considered friendlier and more familiar to users who are used to using SQL for querying data. 
+Pig fits in through its data flow strengths where it takes on the tasks of bringing data into Apache Hadoop and working with it to get it into the form for querying. 
+A good overview of how this works is in Alan Gates posting on the Yahoo Developer blog titled Pig and Hive at Yahoo!. 
+From a technical point of view, both Pig and Hive are feature complete, so you can do tasks in either tool. 
+However, you will find one tool or the other will be preferred by the different groups that have to use Apache Hadoop. 
+The good part is they have a choice and both tools work together.
+
+OUR DATA PROCESSING TASK
+We are going to do the same data processing task as we just did with Pig in the previous tutorial. 
+We have several files of truck driver statistics and we are going to bring them into Hive and do some simple computing with them. 
+We are going to compute the sum of hours and miles logged driven by a truck driver for an year. 
+Once we have the sum of hours and miles logged, we will extend the script to translate a driver id field into the name of the drivers by joining two different tables.
+
+INTRODUCTION
+Hello World is often used by developers to familiarize themselves with new concepts by building a simple program. This tutorial aims to achieve a similar purpose by getting practitioners started with Hadoop and HDP. We will use an Internet of Things (IoT) use case to build your first HDP application.
+
+This tutorial describes how to refine data for a Trucking IoT  Data Discovery (aka IoT Discovery) use case using the Hortonworks Data Platform. The IoT Discovery use cases involves vehicles, devices and people moving across a map or similar surface. Your analysis is targeted to linking location information with your analytic data.
+
+For our tutorial we are looking at a use case where we have a truck fleet. Each truck has been equipped to log location and event data. These events are streamed back to a datacenter where we will be processing the data.  The company wants to use this data to better understand risk.
+
+Here is the video of Analyzing Geolocation Data to show you what you’ll be doing in this tutorial.
+
+PRE-REQUISITES:
+Downloaded and Installed Hortonworks Sandbox
+Before entering hello HDP labs, we highly recommend you go through Learning the Ropes of the Hortonworks Sandbox to become familiar with the Sandbox in a VM and the Ambari Interface.
+Data Set Used: Geolocation.zip
+Optional: Hortonworks ODBC driver installed and configured – see the tutorial on installing the ODBC driver for Windows or OS X. Refer to
+Installing and Configuring the Hortonworks ODBC driver on Windows 7
+Installing and Configuring the Hortonworks ODBC driver on Mac OS X
+In this tutorial, the Hortonworks Sandbox is installed on an Oracle VirtualBox virtual machine (VM) – your screens may be different.
+TUTORIAL OVERVIEW
+In this tutorial, we will provide the collected geolocation and truck data. We will import this data into HDFS and build derived tables in Hive. Then we will process the data using Pig, Hive and Spark. The processed data is then visualized using Apache Zeppelin.
+
+To refine and analyze Geolocation data, we will:
+
+Review some Hadoop Fundamentals
+Download and extract the Geolocation data files.
+Load the captured data into the Hortonworks Sandbox.
+Run Hive, Pig and Spark scripts that compute truck mileage and driver risk factor.
+Visualize the geolocation data using Zeppelin.
+GOALS OF THE TUTORIAL
+The goal of this tutorial is that you get familiar with the basics of following:
+
+Hadoop and HDP
+Ambari File User Views and HDFS
+Ambari Hive User Views and Apache Hive
+Ambari Pig User Views and Apache Pig
+Apache Spark
+Data Visualization with Zeppelin (Optional)
+
+People often ask why do Pig and Hive exist when they seem to do much of the same thing. 
+Hive because of its SQL like query language is often used as the interface to an Apache Hadoop based data warehouse. 
+Hive is considered friendlier and more familiar to users who are used to using SQL for querying data. 
+Pig fits in through its data flow strengths where it takes on the tasks of bringing data into Apache Hadoop and working with it to get it into the form for querying. 
+A good overview of how this works is in Alan Gates posting on the Yahoo Developer blog titled Pig and Hive at Yahoo!. 
+From a technical point of view, both Pig and Hive are feature complete, so you can do tasks in either tool. 
+However, you will find one tool or the other will be preferred by the different groups that have to use Apache Hadoop. 
+The good part is they have a choice and both tools work together.
+
+OUR DATA PROCESSING TASK
+We are going to do the same data processing task as we just did with Pig in the previous tutorial. 
+We have several files of truck driver statistics and we are going to bring them into Hive and do some simple computing with them. 
+We are going to compute the sum of hours and miles logged driven by a truck driver for an year. 
+Once we have the sum of hours and miles logged, we will extend the script to translate a driver id field into the name of the drivers by joining two different tables.
+
+INTRODUCTION
+Hello World is often used by developers to familiarize themselves with new concepts by building a simple program. This tutorial aims to achieve a similar purpose by getting practitioners started with Hadoop and HDP. We will use an Internet of Things (IoT) use case to build your first HDP application.
+
+This tutorial describes how to refine data for a Trucking IoT  Data Discovery (aka IoT Discovery) use case using the Hortonworks Data Platform. The IoT Discovery use cases involves vehicles, devices and people moving across a map or similar surface. Your analysis is targeted to linking location information with your analytic data.
+
+For our tutorial we are looking at a use case where we have a truck fleet. Each truck has been equipped to log location and event data. These events are streamed back to a datacenter where we will be processing the data.  The company wants to use this data to better understand risk.
+
+Here is the video of Analyzing Geolocation Data to show you what you’ll be doing in this tutorial.
+
+PRE-REQUISITES:
+Downloaded and Installed Hortonworks Sandbox
+Before entering hello HDP labs, we highly recommend you go through Learning the Ropes of the Hortonworks Sandbox to become familiar with the Sandbox in a VM and the Ambari Interface.
+Data Set Used: Geolocation.zip
+Optional: Hortonworks ODBC driver installed and configured – see the tutorial on installing the ODBC driver for Windows or OS X. Refer to
+Installing and Configuring the Hortonworks ODBC driver on Windows 7
+Installing and Configuring the Hortonworks ODBC driver on Mac OS X
+In this tutorial, the Hortonworks Sandbox is installed on an Oracle VirtualBox virtual machine (VM) – your screens may be different.
+TUTORIAL OVERVIEW
+In this tutorial, we will provide the collected geolocation and truck data. We will import this data into HDFS and build derived tables in Hive. Then we will process the data using Pig, Hive and Spark. The processed data is then visualized using Apache Zeppelin.
+
+To refine and analyze Geolocation data, we will:
+
+Review some Hadoop Fundamentals
+Download and extract the Geolocation data files.
+Load the captured data into the Hortonworks Sandbox.
+Run Hive, Pig and Spark scripts that compute truck mileage and driver risk factor.
+Visualize the geolocation data using Zeppelin.
+GOALS OF THE TUTORIAL
+The goal of this tutorial is that you get familiar with the basics of following:
+
+Hadoop and HDP
+Ambari File User Views and HDFS
+Ambari Hive User Views and Apache Hive
+Ambari Pig User Views and Apache Pig
+Apache Spark
+Data Visualization with Zeppelin (Optional)
+
+People often ask why do Pig and Hive exist when they seem to do much of the same thing. 
+Hive because of its SQL like query language is often used as the interface to an Apache Hadoop based data warehouse. 
+Hive is considered friendlier and more familiar to users who are used to using SQL for querying data. 
+Pig fits in through its data flow strengths where it takes on the tasks of bringing data into Apache Hadoop and working with it to get it into the form for querying. 
+A good overview of how this works is in Alan Gates posting on the Yahoo Developer blog titled Pig and Hive at Yahoo!. 
+From a technical point of view, both Pig and Hive are feature complete, so you can do tasks in either tool. 
+However, you will find one tool or the other will be preferred by the different groups that have to use Apache Hadoop. 
+The good part is they have a choice and both tools work together.
+
+OUR DATA PROCESSING TASK
+We are going to do the same data processing task as we just did with Pig in the previous tutorial. 
+We have several files of truck driver statistics and we are going to bring them into Hive and do some simple computing with them. 
+We are going to compute the sum of hours and miles logged driven by a truck driver for an year. 
+
+Once we have the sum of hours and miles logged, we will extend the script to translate a driver id field into the name of the drivers by joining two different tables.i
+
+
+
+
+
+This is line added from server
